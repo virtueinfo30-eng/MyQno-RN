@@ -22,6 +22,7 @@ export const AuthNavigator = () => {
       {/* Tab Navigator */}
       <Tab.Navigator
         screenOptions={{
+          swipeEnabled: false,
           tabBarLabelStyle: {
             fontSize: 16,
             fontWeight: '600',
