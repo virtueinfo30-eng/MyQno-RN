@@ -1,0 +1,1088 @@
+{
+  "info": {
+    "name": "MyQno API Collection",
+    "description": "Complete API collection for MyQno React Native Application",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "country_id",
+                  "value": "1"
+                },
+                {
+                  "key": "username",
+                  "value": "user@example.com"
+                },
+                {
+                  "key": "password",
+                  "value": "password123"
+                },
+                {
+                  "key": "app_type",
+                  "value": "user"
+                },
+                {
+                  "key": "device_type",
+                  "value": "android"
+                },
+                {
+                  "key": "device_token",
+                  "value": "FCM_TOKEN_HERE"
+                },
+                {
+                  "key": "latitude",
+                  "value": "40.7128"
+                },
+                {
+                  "key": "longitude",
+                  "value": "-74.0060"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/login/loginuser",
+              "host": ["{{base_url}}api"],
+              "path": ["login", "loginuser"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Region Management",
+      "item": [
+        {
+          "name": "Get Countries",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/region/listcountries",
+              "host": ["{{base_url}}api"],
+              "path": ["region", "listcountries"]
+            }
+          }
+        },
+        {
+          "name": "Get States",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/region/liststates/1",
+              "host": ["{{base_url}}api"],
+              "path": ["region", "liststates", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Cities",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/region/listcities/1",
+              "host": ["{{base_url}}api"],
+              "path": ["region", "listcities", "1"]
+            }
+          }
+        },
+        {
+          "name": "Get Company Categories",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/company/listcompanycategories/no",
+              "host": ["{{base_url}}api"],
+              "path": ["company", "listcompanycategories", "no"]
+            }
+          }
+        },
+        {
+          "name": "Show Active Companies",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "category",
+                  "value": "0"
+                },
+                {
+                  "key": "latitude",
+                  "value": "40.7128"
+                },
+                {
+                  "key": "longitude",
+                  "value": "-74.0060"
+                },
+                {
+                  "key": "search_text",
+                  "value": ""
+                },
+                {
+                  "key": "user_distance",
+                  "value": "25"
+                },
+                {
+                  "key": "qdate",
+                  "value": "2024-02-12"
+                },
+                {
+                  "key": "persons",
+                  "value": "1"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/region/showactivecompanies",
+              "host": ["{{base_url}}api"],
+              "path": ["region", "showactivecompanies"]
+            }
+          }
+        },
+        {
+          "name": "Show Active Queues",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/region/showcompanyqueues",
+              "host": ["{{base_url}}api"],
+              "path": ["region", "showcompanyqueues"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Registration",
+      "item": [
+        {
+          "name": "Register Company",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "company_name",
+                  "value": "My Company"
+                },
+                {
+                  "key": "company_email",
+                  "value": "company@example.com"
+                },
+                {
+                  "key": "company_phone",
+                  "value": "+1234567890"
+                },
+                {
+                  "key": "category_id",
+                  "value": "1"
+                },
+                {
+                  "key": "country_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/register/registercompany",
+              "host": ["{{base_url}}api"],
+              "path": ["register", "registercompany"]
+            }
+          }
+        },
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "first_name",
+                  "value": "John"
+                },
+                {
+                  "key": "last_name",
+                  "value": "Doe"
+                },
+                {
+                  "key": "mobile_number",
+                  "value": "+1234567890"
+                },
+                {
+                  "key": "email_id",
+                  "value": "john@example.com"
+                },
+                {
+                  "key": "cmb_country",
+                  "value": "1"
+                },
+                {
+                  "key": "latitude",
+                  "value": "40.7128"
+                },
+                {
+                  "key": "longitude",
+                  "value": "-74.0060"
+                },
+                {
+                  "key": "device_token",
+                  "value": "FCM_TOKEN"
+                },
+                {
+                  "key": "device_type",
+                  "value": "android"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/user/userregister",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "userregister"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "User Profile",
+      "item": [
+        {
+          "name": "Fetch User Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/user/fetchuser/1",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "fetchuser", "1"]
+            }
+          }
+        },
+        {
+          "name": "Update User Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "user_id",
+                  "value": "1"
+                },
+                {
+                  "key": "first_name",
+                  "value": "John"
+                },
+                {
+                  "key": "middle_name",
+                  "value": ""
+                },
+                {
+                  "key": "last_name",
+                  "value": "Doe"
+                },
+                {
+                  "key": "mobile_number",
+                  "value": "+1234567890"
+                },
+                {
+                  "key": "email_id",
+                  "value": "john@example.com"
+                },
+                {
+                  "key": "address",
+                  "value": "123 Main St"
+                },
+                {
+                  "key": "country_id",
+                  "value": "1"
+                },
+                {
+                  "key": "state_id",
+                  "value": "1"
+                },
+                {
+                  "key": "city_id",
+                  "value": "1"
+                },
+                {
+                  "key": "gender",
+                  "value": "M"
+                },
+                {
+                  "key": "birth_date",
+                  "value": "1990-01-01"
+                },
+                {
+                  "key": "latitude",
+                  "value": "40.7128"
+                },
+                {
+                  "key": "longitude",
+                  "value": "-74.0060"
+                },
+                {
+                  "key": "device_token",
+                  "value": "FCM_TOKEN"
+                },
+                {
+                  "key": "device_type",
+                  "value": "android"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/user/update/1",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "update", "1"]
+            }
+          }
+        },
+        {
+          "name": "Upload Profile Picture",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "user_id",
+                  "value": "1"
+                },
+                {
+                  "key": "profile_pic",
+                  "type": "file",
+                  "src": ""
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/user/uploaduserpic",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "uploaduserpic"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tokens Management",
+      "item": [
+        {
+          "name": "Fetch My Tokens",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/user/fetchusertokens/1/-1/-1/-1",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "fetchusertokens", "1", "-1", "-1", "-1"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/user/canceltoken/1/C",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "canceltoken", "1", "C"]
+            }
+          }
+        },
+        {
+          "name": "Queue Me In",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "company_id",
+                  "value": "1"
+                },
+                {
+                  "key": "queue_master_id",
+                  "value": "1"
+                },
+                {
+                  "key": "no_of_persons",
+                  "value": "1"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/user/usequeuein",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "usequeuein"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shared Tokens",
+      "item": [
+        {
+          "name": "Fetch Shared Tokens",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "user_id",
+                  "value": "{{logged_user_id}}"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/user/fetchsharedtokens",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "fetchsharedtokens"]
+            }
+          }
+        },
+        {
+          "name": "Share User Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "user_id",
+                  "value": "1"
+                },
+                {
+                  "key": "user_token_id",
+                  "value": "1"
+                },
+                {
+                  "key": "shared_datetime",
+                  "value": "2024-02-12 10:30:00"
+                },
+                {
+                  "key": "share_to",
+                  "value": "[{\"mobile\":\"9876543210\",\"fullname\":\"Jane Doe\"}]"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/user/setsharedtoken",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "setsharedtoken"]
+            }
+          }
+        },
+        {
+          "name": "Cancel Shared Token",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/user/cancelsharedtoken/1/1",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "cancelsharedtoken", "1", "1"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Wallet",
+      "item": [
+        {
+          "name": "Get Wallet Balance",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/wallet/availablebalance",
+              "host": ["{{base_url}}api"],
+              "path": ["wallet", "availablebalance"]
+            }
+          }
+        },
+        {
+          "name": "Fetch Wallet Invoices",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/wallet/fetchuserinvoice/0",
+              "host": ["{{base_url}}api"],
+              "path": ["wallet", "fetchuserinvoice", "0"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Places & Companies",
+      "item": [
+        {
+          "name": "Get Places Visited",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/company/alreadyvisited",
+              "host": ["{{base_url}}api"],
+              "path": ["company", "alreadyvisited"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        {
+          "name": "Search Companies",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "category",
+                  "value": "0"
+                },
+                {
+                  "key": "latitude",
+                  "value": "40.7128"
+                },
+                {
+                  "key": "longitude",
+                  "value": "-74.0060"
+                },
+                {
+                  "key": "search_text",
+                  "value": "restaurant"
+                },
+                {
+                  "key": "user_distance",
+                  "value": "25"
+                },
+                {
+                  "key": "qdate",
+                  "value": "2024-02-12"
+                },
+                {
+                  "key": "persons",
+                  "value": "1"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/region/showactivecompanies",
+              "host": ["{{base_url}}api"],
+              "path": ["region", "showactivecompanies"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Utilities",
+      "item": [
+        {
+          "name": "Check Duplicate Mobile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/comcode/ismobilenoduplicate/9876543210",
+              "host": ["{{base_url}}api"],
+              "path": ["comcode", "ismobilenoduplicate", "9876543210"]
+            }
+          }
+        },
+        {
+          "name": "Generate OTP",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/comcode/generateotpformobile/9876543210",
+              "host": ["{{base_url}}api"],
+              "path": ["comcode", "generateotpformobile", "9876543210"]
+            }
+          }
+        },
+        {
+          "name": "Confirm OTP",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              }
+            ],
+            "url": {
+              "raw": "{{base_url}}api/comcode/otpconfirmed/9876543210/123456",
+              "host": ["{{base_url}}api"],
+              "path": ["comcode", "otpconfirmed", "9876543210", "123456"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Account Management",
+      "item": [
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/x-www-form-urlencoded"
+              }
+            ],
+            "body": {
+              "mode": "urlencoded",
+              "urlencoded": [
+                {
+                  "key": "old_password",
+                  "value": "oldpassword123"
+                },
+                {
+                  "key": "new_password",
+                  "value": "newpassword123"
+                },
+                {
+                  "key": "confirm_password",
+                  "value": "newpassword123"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/user/changepassword",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "changepassword"]
+            }
+          }
+        },
+        {
+          "name": "Add Feedback",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09"
+              },
+              {
+                "key": "Http-App-Name",
+                "value": "android"
+              },
+              {
+                "key": "Logged-User-Id",
+                "value": "{{logged_user_id}}"
+              },
+              {
+                "key": "Content-Type",
+                "value": "multipart/form-data"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "company_id",
+                  "value": "1"
+                },
+                {
+                  "key": "rating",
+                  "value": "5"
+                },
+                {
+                  "key": "comment",
+                  "value": "Great service!"
+                },
+                {
+                  "key": "user_token_id",
+                  "value": "1"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}api/user/addfeedback",
+              "host": ["{{base_url}}api"],
+              "path": ["user", "addfeedback"]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "https://myqno.com/qapp/",
+      "type": "string"
+    },
+    {
+      "key": "logged_user_id",
+      "value": "1",
+      "type": "string"
+    }
+  ]
+}
