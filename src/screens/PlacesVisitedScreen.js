@@ -7,19 +7,33 @@ import {
   TextInput,
   TouchableOpacity,
   RefreshControl,
+  Modal,
 } from 'react-native';
 import { theme } from '../theme';
 import { fetchPlacesVisited } from '../api';
+import { useNavigation } from '@react-navigation/native';
+import { CustomInput } from '../components/CustomInput';
 
 export const PlacesVisitedScreen = () => {
+  const navigation = useNavigation();
   const [places, setPlaces] = useState([]);
   const [searchText, setSearchText] = useState('');
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Modal State
+  const [modalVisible, setModalVisible] = useState(false);
+  const [selectedPlace, setSelectedPlace] = useState(null);
+  const [noOfPersons, setNoOfPersons] = useState('1');
+  const [selectedDate, setSelectedDate] = useState('Today'); // Simplified specifically for this modal request
+
   useEffect(() => {
-    loadPlaces();
-  }, []);
+    const delayDebounceFn = setTimeout(() => {
+      loadPlaces(searchText);
+    }, 500);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchText]);
 
   const loadPlaces = async (search = '') => {
     setLoading(true);
@@ -44,16 +58,32 @@ export const PlacesVisitedScreen = () => {
     loadPlaces(searchText);
   };
 
+  const handlePlaceClick = item => {
+    setSelectedPlace(item);
+    setNoOfPersons('1');
+    setSelectedDate('Today');
+    setModalVisible(true);
+  };
+
+  const handleGetToken = () => {
+    setModalVisible(false);
+    if (selectedPlace) {
+      navigation.navigate('ConfirmToken', {
+        companyLocationId: selectedPlace.company_locations_id,
+        companyName: selectedPlace.company_name,
+        noOfPersons: noOfPersons,
+        date:
+          selectedDate === 'Today'
+            ? new Date().toISOString().split('T')[0]
+            : selectedDate, // Handle 'Today' or specific date if picker used
+      });
+    }
+  };
+
   const renderPlaceItem = ({ item }) => (
     <TouchableOpacity
       style={styles.placeCard}
-      onPress={() =>
-        navigation.navigate('ConfirmToken', {
-          companyLocationId: item.company_locations_id,
-          companyName: item.company_name,
-          noOfPersons: '1',
-        })
-      }
+      onPress={() => handlePlaceClick(item)}
     >
       <View style={styles.placeHeader}>
         <Text style={styles.companyName}>{item.company_name}</Text>
@@ -124,6 +154,64 @@ export const PlacesVisitedScreen = () => {
           </View>
         }
       />
+
+      {/* Get Token Modal */}
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContent}>
+            {/* Modal Header */}
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>Get Token</Text>
+              <Text style={styles.modalSubtitle}>
+                of {selectedPlace?.company_name || 'Company'}
+              </Text>
+            </View>
+
+            {/* Modal Body */}
+            <View style={styles.modalBody}>
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.modalInput}
+                  value={noOfPersons}
+                  onChangeText={setNoOfPersons}
+                  placeholder="No of Persons"
+                  keyboardType="numeric"
+                />
+              </View>
+
+              <View style={styles.inputContainer}>
+                <TextInput
+                  style={styles.modalInput}
+                  value={selectedDate}
+                  onChangeText={setSelectedDate}
+                  placeholder="Date"
+                  editable={false} // Read-only as per screenshot implication usually, or editable? Screenshot shows "Today". We'll keep it simple/editable for now or just display. User didn't ask for date picker in modal specifically, just fields.
+                />
+              </View>
+
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.cancelButton]}
+                  onPress={() => setModalVisible(false)}
+                >
+                  <Text style={styles.buttonText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, styles.okButton]}
+                  onPress={handleGetToken}
+                >
+                  <Text style={styles.buttonText}>OK</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -240,5 +328,78 @@ const styles = StyleSheet.create({
     fontSize: theme.fontSize.medium,
     color: theme.colors.textSecondary,
     opacity: 0.7,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: theme.spacing.xl,
+  },
+  modalContent: {
+    width: '100%',
+    backgroundColor: theme.colors.white,
+    borderRadius: theme.borderRadius.m,
+    overflow: 'hidden',
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+  },
+  modalHeader: {
+    backgroundColor: theme.colors.primary, // Red header
+    padding: theme.spacing.l,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: theme.fontSize.large,
+    fontWeight: 'bold',
+    color: theme.colors.white,
+    marginBottom: theme.spacing.xs,
+  },
+  modalSubtitle: {
+    fontSize: theme.fontSize.small,
+    color: theme.colors.white,
+    opacity: 0.9,
+  },
+  modalBody: {
+    padding: theme.spacing.l,
+    backgroundColor: theme.colors.white,
+  },
+  inputContainer: {
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: theme.borderRadius.s,
+    marginBottom: theme.spacing.m,
+    paddingHorizontal: theme.spacing.s,
+  },
+  modalInput: {
+    height: 40,
+    fontSize: theme.fontSize.medium,
+    color: theme.colors.textPrimary,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: theme.spacing.s,
+    gap: theme.spacing.m,
+  },
+  modalButton: {
+    flex: 1,
+    paddingVertical: theme.spacing.m,
+    borderRadius: theme.borderRadius.s,
+    alignItems: 'center',
+  },
+  cancelButton: {
+    backgroundColor: theme.colors.primary, // Red as per screenshot likely? Or maybe grey. Screenshot shows red cancel too.
+  },
+  okButton: {
+    backgroundColor: theme.colors.primary,
+  },
+  buttonText: {
+    color: theme.colors.white,
+    fontWeight: 'bold',
+    fontSize: theme.fontSize.medium,
   },
 });

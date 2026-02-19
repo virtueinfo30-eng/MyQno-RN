@@ -1,5 +1,11 @@
 import React from 'react';
-import { View, TextInput, Text, StyleSheet } from 'react-native';
+import {
+  View,
+  TextInput,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+} from 'react-native';
 import { theme } from '../theme';
 
 export const CustomInput = ({
@@ -9,6 +15,7 @@ export const CustomInput = ({
   leftIcon,
   rightIcon,
   style,
+  onRightIconPress,
   ...props
 }) => {
   return (
@@ -22,7 +29,12 @@ export const CustomInput = ({
           {...props}
         />
         {rightIcon && (
-          <View style={styles.rightIconContainer}>{rightIcon}</View>
+          <TouchableOpacity
+            onPress={onRightIconPress}
+            style={styles.rightIconContainer}
+          >
+            {rightIcon}
+          </TouchableOpacity>
         )}
       </View>
       {error && <Text style={styles.errorText}>{error}</Text>}

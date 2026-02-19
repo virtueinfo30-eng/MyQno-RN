@@ -25,6 +25,11 @@ export const SharedTokensTab = () => {
   useEffect(() => {
     if (userId) {
       loadTokens();
+      // Auto-refresh every 30 seconds, matching native Android TimeManager
+      const interval = setInterval(() => {
+        loadTokens();
+      }, 30000);
+      return () => clearInterval(interval);
     }
   }, [userId]);
 

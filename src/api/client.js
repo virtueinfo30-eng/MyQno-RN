@@ -50,7 +50,7 @@ apiClient.interceptors.request.use(
 
         // Use user_master_id if available, fallback to logged_user_id
         const masterId = session.user_master_id || session.logged_user_id;
-        config.headers['User-Master-Id'] = safeHeader(masterId);
+        config.headers['user-master-id'] = safeHeader(masterId);
 
         // App Type
         config.headers['Http-App-Type'] = 'user'; // Hardcoded 'user' for now, matching config

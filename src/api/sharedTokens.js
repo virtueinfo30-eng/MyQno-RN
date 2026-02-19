@@ -43,23 +43,15 @@ export const fetchSharedTokens = async () => {
 
 export const cancelSharedToken = async userTokenSharedId => {
   try {
-    const userId = await AsyncStorage.getItem('userId');
-    // Replace placeholders in URL
-    let url = ENDPOINTS.CANCEL_SHARED_TOKEN;
-    // Note: The endpoint in config might need adjustment if it has placeholders,
-    // or we append params if it's a GET request with query params?
-    // Native code: URLs.CancelSharedToken.replace("{user_id}", ...).replace("{user_token_shared_id}", ...)
-    // Let's assume the config endpoint has placeholders: api/user/cancelsharedtoken/{user_id}/{user_token_shared_id}
+    // Read userId from user_session JSON (same as fetchSharedTokens)
+    const userSession = await AsyncStorage.getItem('user_session');
+    if (!userSession) {
+      return { success: false, message: 'User not logged in' };
+    }
+    const userData = JSON.parse(userSession);
+    const userId = userData.logged_user_id;
 
-    // Check if config endpoint has placeholders, if not we might need to adjust config or this logic.
-    // Based on previous step, I defined it as 'api/user/cancelsharedtoken' which might be wrong if it needs placeholders.
-    // Native code uses: api/user/cancelsharedtoken/{user_id}/{user_token_shared_id}
-    // Let's double check config I wrote.
-    // I wrote: CANCEL_SHARED_TOKEN: 'api/user/cancelsharedtoken',
-    // I should probably fix the config to include placeholders or handle it here.
-
-    // Let's assume I fix the config in next step or use string manipulation here.
-    // Correct URL construction:
+    // Native uses: api/user/cancelsharedtoken/{user_id}/{user_token_shared_id}
     const finalUrl = `api/user/cancelsharedtoken/${userId}/${userTokenSharedId}`;
 
     const response = await apiClient.get(finalUrl);

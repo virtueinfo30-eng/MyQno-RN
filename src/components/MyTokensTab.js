@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -10,11 +10,14 @@ import {
   Share,
   Modal,
   TextInput,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
 import { theme } from '../theme';
 import { fetchMyTokens, cancelToken, addFeedback } from '../api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
+import Geolocation from 'react-native-geolocation-service';
 
 export const MyTokensTab = () => {
   const navigation = useNavigation();
@@ -22,6 +25,7 @@ export const MyTokensTab = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState('');
+  const [userLocation, setUserLocation] = useState(null); // GPS location
 
   // Feedback State
   const [feedbackVisible, setFeedbackVisible] = useState(false);
@@ -31,11 +35,17 @@ export const MyTokensTab = () => {
 
   useEffect(() => {
     loadUserId();
+    requestLocationPermission();
   }, []);
 
   useEffect(() => {
     if (userId) {
       loadTokens();
+      // Auto-refresh every 30 seconds, matching native Android TimeManager
+      const interval = setInterval(() => {
+        loadTokens();
+      }, 30000);
+      return () => clearInterval(interval);
     }
   }, [userId]);
 
@@ -52,6 +62,55 @@ export const MyTokensTab = () => {
     } catch (error) {
       console.error('Error loading user ID:', error);
     }
+  };
+
+  const requestLocationPermission = async () => {
+    try {
+      if (Platform.OS === 'android') {
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+          {
+            title: 'Location Permission',
+            message:
+              'MyQno needs your location to show distance to token locations.',
+            buttonPositive: 'OK',
+          },
+        );
+        if (granted !== PermissionsAndroid.RESULTS.GRANTED) return;
+      }
+      Geolocation.getCurrentPosition(
+        position => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude,
+          });
+        },
+        error => console.warn('GPS Error:', error),
+        { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 },
+      );
+    } catch (err) {
+      console.warn('Location permission error:', err);
+    }
+  };
+
+  /**
+   * Calculate straight-line distance between two lat/lng points (Haversine formula).
+   * Returns distance in km as a string like "2.3 km".
+   */
+  const getDistance = (lat1, lng1, lat2, lng2) => {
+    if (!lat1 || !lng1 || !lat2 || !lng2) return null;
+    const R = 6371; // Earth radius in km
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLng = ((lng2 - lng1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLng / 2) *
+        Math.sin(dLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c;
+    return d < 1 ? `${Math.round(d * 1000)} m` : `${d.toFixed(1)} km`;
   };
 
   const loadTokens = async () => {
@@ -208,6 +267,17 @@ export const MyTokensTab = () => {
         <Text style={styles.detailText}>📍 {item.location_name}</Text>
         <Text style={styles.detailText}>📅 {item.queue_date}</Text>
         <Text style={styles.detailText}>👥 {item.persons} Person(s)</Text>
+        {userLocation && item.latitude && item.longitude && (
+          <Text style={styles.detailText}>
+            🗺️{' '}
+            {getDistance(
+              userLocation.lat,
+              userLocation.lng,
+              parseFloat(item.latitude),
+              parseFloat(item.longitude),
+            )}
+          </Text>
+        )}
       </View>
 
       {item.token_status === 'I' && (

@@ -1,5 +1,5 @@
 export const API_CONFIG = {
-  BASE_URL: 'https://myqno.com/qapp/', // Matching native URL_PRODUCTION
+  BASE_URL: 'https://myqno.com/qapp/', // Matching native URL_PRODUCTION exactly
   HEADERS: {
     AUTHORIZATION: 'Basic YW5kcm9pZF92aV82MDU6MUAzJCVWST09',
     HTTP_APP_NAME: 'android',
@@ -35,4 +35,12 @@ export const ENDPOINTS = {
   FEEDBACK_USER: 'api/user/addfeedback',
   SHARE_USER_TOKEN: 'api/user/setsharedtoken',
   CHANGE_PASSWORD: 'api/user/changepassword',
+  FORGOT_PASSWORD: 'api/login/forgotpassword',
+  CANCEL_TOKEN: 'api/user/updateusertoken', // {token_id}/{token_status}
+  CANCEL_SHARED_TOKEN_URL: 'api/user/cancelsharedtoken', // {user_id}/{user_token_shared_id}
+  IMPORT_CONTACTS: 'api/user/importcontacts', // {imported_by_user_id}
+  LOCATION_LIST: 'api/region/listlocations', // {cid}
+  UPDATE_USER_LAT_LONG: 'api/user/updatelatlong', // {user_id}
+  GET_USER_FROM_MOBILE: 'api/comcode/getuserfrommobile', // {mobile_no}
+  FETCH_ALL_QUEUE_TOKENS: 'api/user/fetchallqueuetokens', // {USER_TOKEN_ID}
 };

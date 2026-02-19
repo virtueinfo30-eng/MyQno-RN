@@ -15,6 +15,7 @@ import Contacts from 'react-native-contacts';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { theme } from '../theme';
 import { shareUserToken } from '../api';
+import { importContacts } from '../api/profile';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const ContactSelectionScreen = () => {
@@ -61,30 +62,55 @@ export const ContactSelectionScreen = () => {
     }
   };
 
-  const fetchContacts = () => {
-    Contacts.getAll()
-      .then(contacts => {
-        // Filter contacts with phone numbers
-        const validContacts = contacts
-          .filter(c => c.phoneNumbers && c.phoneNumbers.length > 0)
-          .map(c => ({
-            recordID: c.recordID,
-            displayName: c.displayName || `${c.givenName} ${c.familyName}`,
-            phoneNumbers: c.phoneNumbers,
-          }))
-          .sort((a, b) =>
-            (a.displayName || '').localeCompare(b.displayName || ''),
-          );
+  const fetchContacts = async () => {
+    try {
+      const allContacts = await Contacts.getAll();
+      // Filter contacts with phone numbers
+      const validContacts = allContacts
+        .filter(c => c.phoneNumbers && c.phoneNumbers.length > 0)
+        .map(c => ({
+          recordID: c.recordID,
+          displayName: c.displayName || `${c.givenName} ${c.familyName}`,
+          phoneNumbers: c.phoneNumbers,
+        }))
+        .sort((a, b) =>
+          (a.displayName || '').localeCompare(b.displayName || ''),
+        );
 
-        setContacts(validContacts);
-        setFilteredContacts(validContacts);
-        setLoading(false);
-      })
-      .catch(e => {
-        console.log(e);
-        setLoading(false);
-        Alert.alert('Error', 'Failed to load contacts');
-      });
+      setContacts(validContacts);
+      setFilteredContacts(validContacts);
+      setLoading(false);
+
+      // Import contacts to server (matching native Android behavior)
+      importContactsToServer(validContacts);
+    } catch (e) {
+      console.log(e);
+      setLoading(false);
+      Alert.alert('Error', 'Failed to load contacts');
+    }
+  };
+
+  const importContactsToServer = async contactList => {
+    try {
+      const userSession = await AsyncStorage.getItem('user_session');
+      if (!userSession) return;
+      const userData = JSON.parse(userSession);
+      const userId = userData.logged_user_id;
+      if (!userId) return;
+
+      // Format: [{mobile_number: "...", full_name: "..."}]
+      const formatted = contactList
+        .map(c => ({
+          mobile_number: c.phoneNumbers[0]?.number?.replace(/\D/g, '') || '',
+          full_name: c.displayName || '',
+        }))
+        .filter(c => c.mobile_number.length > 0);
+
+      await importContacts(userId, formatted);
+      console.log('✅ [ContactSelection] Contacts imported to server');
+    } catch (err) {
+      console.warn('⚠️ [ContactSelection] Failed to import contacts:', err);
+    }
   };
 
   const handleSearch = text => {
@@ -119,7 +145,10 @@ export const ContactSelectionScreen = () => {
     }
 
     setSubmitting(true);
-    const userId = await AsyncStorage.getItem('userId');
+    // Read userId from user_session JSON (not the non-existent 'userId' key)
+    const userSession = await AsyncStorage.getItem('user_session');
+    const userData = userSession ? JSON.parse(userSession) : {};
+    const userId = userData.logged_user_id || userData.user_master_id || '';
 
     // Format contacts for API: { mobile: "...", fullname: "..." }
     // Taking the first phone number for simplicity. In a real app, might let user choose.

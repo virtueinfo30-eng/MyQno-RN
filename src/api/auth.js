@@ -1,6 +1,7 @@
 import apiClient from './client';
 import { ENDPOINTS, API_CONFIG } from './config';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getFCMToken } from '../utils/fcmService';
 
 export const loginUser = async (
   countryId,
@@ -16,7 +17,7 @@ export const loginUser = async (
     params.append('password', password);
     params.append('app_type', API_CONFIG.HEADERS.HTTP_APP_TYPE_USER);
     params.append('device_type', 'android');
-    params.append('device_token', 'TODO_GET_FCM_TOKEN');
+    params.append('device_token', await getFCMToken());
     params.append('latitude', latitude);
     params.append('longitude', longitude);
 
@@ -129,6 +130,43 @@ export const loginUser = async (
     }
   } catch (error) {
     console.error('Login Error:', error);
+    return {
+      success: false,
+      message: error.message || 'Network request failed',
+    };
+  }
+};
+
+export const forgotPassword = async (countryId, mobile) => {
+  try {
+    const params = new URLSearchParams();
+    params.append('country_id', countryId);
+    params.append('username', mobile);
+
+    const response = await apiClient.post(
+      ENDPOINTS.FORGOT_PASSWORD,
+      params.toString(),
+    );
+    console.log('Forgot Password Response:', response.data);
+
+    if (
+      response.data &&
+      (response.data.found ||
+        response.data.type === 'SUCCESS' ||
+        response.data.type === 'success')
+    ) {
+      return {
+        success: true,
+        message: response.data.message || 'Password reset instructions sent.',
+      };
+    } else {
+      return {
+        success: false,
+        message: response.data?.message || 'Failed to reset password.',
+      };
+    }
+  } catch (error) {
+    console.error('Forgot Password Error:', error);
     return {
       success: false,
       message: error.message || 'Network request failed',

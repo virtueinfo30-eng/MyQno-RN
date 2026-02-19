@@ -11,6 +11,7 @@ import {
   Alert,
   ActivityIndicator,
   Platform,
+  DeviceEventEmitter,
 } from 'react-native';
 
 import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
@@ -28,6 +29,7 @@ import { fetchCountries, fetchStates, fetchCities } from '../api/region';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { OTPDialog } from '../components/OTPDialog';
 import { Dropdown } from '../components/Dropdown';
+import { CustomInput } from '../components/CustomInput';
 
 export const ProfileScreen = () => {
   const [profile, setProfile] = useState(null);
@@ -93,42 +95,6 @@ export const ProfileScreen = () => {
         const id = session.logged_user_id || session.user_id; // Handle both
         console.log('User ID from session:', id);
         setUserId(id || '');
-
-        // If session has profile data (merged from login), use it immediately
-        if (session.first_name || session.user_full_name) {
-          console.log('✨ [ProfileScreen] Initializing from Session Data');
-          const initialProfile = { ...session };
-          setProfile(initialProfile);
-
-          setFormData({
-            first_name: initialProfile.first_name || '',
-            middle_name: initialProfile.middle_name || '',
-            last_name: initialProfile.last_name || '',
-            mobile_number:
-              initialProfile.reg_mobile || initialProfile.logged_mobile || '',
-            email_id: initialProfile.reg_email_id || '',
-            address: initialProfile.address || '',
-            gender: initialProfile.gender || 'M',
-            birth_date: initialProfile.birth_date || '',
-            country_id: initialProfile.country_id || '',
-            country_name: initialProfile.country_name || '',
-            state_id: initialProfile.state_id || '',
-            state_name: initialProfile.state_name || '',
-            city_id: initialProfile.city_id || '',
-            city_name: initialProfile.city_name || '',
-          });
-          setOriginalMobile(
-            initialProfile.reg_mobile || initialProfile.logged_mobile || '',
-          );
-
-          // Load states and cities if IDs exist
-          if (initialProfile.country_id) {
-            loadStates(initialProfile.country_id);
-          }
-          if (initialProfile.state_id) {
-            loadCities(initialProfile.state_id);
-          }
-        }
       } else {
         console.log('No user session found');
       }
@@ -173,7 +139,10 @@ export const ProfileScreen = () => {
     if (!profile) setLoading(true);
 
     const result = await fetchUserProfile(userId);
-    console.log('Profile Result:', result);
+    console.log(
+      '🚀 [ProfileScreen] fetchUserProfile Result:',
+      JSON.stringify(result, null, 2),
+    );
     setLoading(false);
 
     if (result.success) {
@@ -300,6 +269,45 @@ export const ProfileScreen = () => {
     setSaving(false);
 
     if (result.success) {
+      // Update session with new profile data
+      try {
+        const sessionStr = await AsyncStorage.getItem('user_session');
+        if (sessionStr) {
+          const session = JSON.parse(sessionStr);
+          // Merge new data
+          const updatedSession = { ...session, ...result.data };
+
+          const newFirstName = result.data.first_name || formData.first_name;
+          const newLastName = result.data.last_name || formData.last_name;
+
+          updatedSession.user_full_name =
+            `${newFirstName} ${newLastName}`.trim();
+
+          if (result.data.mobile_number)
+            updatedSession.user_mobile = result.data.mobile_number;
+          else if (formData.mobile_number)
+            updatedSession.user_mobile = formData.mobile_number;
+
+          if (result.data.user_pic)
+            updatedSession.user_pic = result.data.user_pic;
+
+          console.log(
+            '📝 [ProfileScreen] Updated Session Data to be saved:',
+            JSON.stringify(updatedSession, null, 2),
+          );
+
+          await AsyncStorage.setItem(
+            'user_session',
+            JSON.stringify(updatedSession),
+          );
+          // Notify other components
+          DeviceEventEmitter.emit('profile_updated', updatedSession);
+          console.log('✅ [ProfileScreen] Session updated and event emitted');
+        }
+      } catch (err) {
+        console.error('Failed to update session locally:', err);
+      }
+
       Alert.alert('Success', result.message, [
         {
           text: 'OK',
@@ -407,8 +415,33 @@ export const ProfileScreen = () => {
     setUploadingImage(false);
 
     if (result.success) {
+      // Update session with new profile pic
+      try {
+        const sessionStr = await AsyncStorage.getItem('user_session');
+        if (sessionStr) {
+          const session = JSON.parse(sessionStr);
+          // Update user_pic in session
+          session.user_pic = result.profilePic;
+
+          await AsyncStorage.setItem('user_session', JSON.stringify(session));
+          DeviceEventEmitter.emit('profile_updated', session);
+          console.log(
+            '✅ [ProfileScreen] Profile pic updated in session and event emitted',
+          );
+
+          // IMMEDIATE UI UPDATE:
+          // Update the profile state with the new image path so it displays the server URL
+          setProfile(prev => ({ ...prev, user_pic: result.profilePic }));
+          // Clear the local selected image so the UI switches to using profile.user_pic
+          setSelectedImage(null);
+        }
+      } catch (err) {
+        console.error('Failed to update session for image:', err);
+      }
+
       Alert.alert('Success', result.message);
-      await loadProfile();
+      // Background refresh to ensure everything is synced
+      loadProfile();
     } else {
       Alert.alert('Error', result.message);
       setSelectedImage(null);
@@ -489,34 +522,6 @@ export const ProfileScreen = () => {
     }
   };
 
-  const EditableField = ({ label, value, onChangeText, error, ...props }) => (
-    <View style={styles.fieldContainer}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      <TextInput
-        style={[styles.input, error && styles.inputError]}
-        value={value}
-        onChangeText={onChangeText}
-        {...props}
-      />
-      {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
-  );
-
-  const DropdownField = ({ label, value, onPress, error }) => (
-    <View style={styles.fieldContainer}>
-      <Text style={styles.fieldLabel}>{label}</Text>
-      <TouchableOpacity
-        style={[styles.dropdownButton, error && styles.inputError]}
-        onPress={onPress}
-      >
-        <Text style={[styles.dropdownText, !value && styles.placeholderText]}>
-          {value || `Select ${label}`}
-        </Text>
-      </TouchableOpacity>
-      {error && <Text style={styles.errorText}>{error}</Text>}
-    </View>
-  );
-
   if (!profile && !loading) {
     return (
       <View style={styles.emptyContainer}>
@@ -528,7 +533,7 @@ export const ProfileScreen = () => {
   const displayImage = selectedImage
     ? selectedImage.uri
     : profile?.user_pic
-    ? `https://myqno.com/qapp/user_pics/${profile.user_pic}`
+    ? `https://myqno.com/qapp/${profile.user_pic}?t=${new Date().getTime()}`
     : null;
 
   return (
@@ -577,7 +582,7 @@ export const ProfileScreen = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Personal Information</Text>
 
-          <EditableField
+          <CustomInput
             label="First Name *"
             value={formData.first_name}
             onChangeText={text =>
@@ -586,7 +591,7 @@ export const ProfileScreen = () => {
             placeholder="Enter First Name"
             error={errors.first_name}
           />
-          <EditableField
+          <CustomInput
             label="Middle Name"
             value={formData.middle_name}
             onChangeText={text =>
@@ -595,7 +600,7 @@ export const ProfileScreen = () => {
             placeholder="Enter Middle Name"
             error={errors.middle_name}
           />
-          <EditableField
+          <CustomInput
             label="Last Name *"
             value={formData.last_name}
             onChangeText={text => setFormData({ ...formData, last_name: text })}
@@ -674,7 +679,7 @@ export const ProfileScreen = () => {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Contact Information</Text>
 
-          <EditableField
+          <CustomInput
             label="Mobile Number *"
             value={formData.mobile_number}
             onChangeText={text =>
@@ -684,7 +689,7 @@ export const ProfileScreen = () => {
             keyboardType="phone-pad"
             error={errors.mobile_number}
           />
-          <EditableField
+          <CustomInput
             label="Email"
             value={formData.email_id}
             onChangeText={text => setFormData({ ...formData, email_id: text })}
@@ -692,7 +697,7 @@ export const ProfileScreen = () => {
             keyboardType="email-address"
             autoCapitalize="none"
           />
-          <EditableField
+          <CustomInput
             label="Address"
             value={formData.address}
             onChangeText={text => setFormData({ ...formData, address: text })}
@@ -829,6 +834,21 @@ export const ProfileScreen = () => {
     </View>
   );
 };
+
+const DropdownField = ({ label, value, onPress, error }) => (
+  <View style={styles.fieldContainer}>
+    <Text style={styles.fieldLabel}>{label}</Text>
+    <TouchableOpacity
+      style={[styles.dropdownButton, error && styles.inputError]}
+      onPress={onPress}
+    >
+      <Text style={[styles.dropdownText, !value && styles.placeholderText]}>
+        {value || `Select ${label}`}
+      </Text>
+    </TouchableOpacity>
+    {error && <Text style={styles.errorText}>{error}</Text>}
+  </View>
+);
 
 const styles = StyleSheet.create({
   container: {

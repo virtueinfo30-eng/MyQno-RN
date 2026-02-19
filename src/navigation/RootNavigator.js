@@ -7,12 +7,13 @@ import { MapScreen } from '../screens/MapScreen';
 import { ScanQRCodeScreen } from '../screens/ScanQRCodeScreen';
 import { AuthNavigator } from './AuthNavigator';
 import { DrawerNavigator } from './DrawerNavigator';
+import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
 
 const Stack = createNativeStackNavigator();
 
-export const RootNavigator = () => {
+export const RootNavigator = ({ navigationRef }) => {
   return (
-    <NavigationContainer>
+    <NavigationContainer ref={navigationRef}>
       <Stack.Navigator
         initialRouteName="Splash"
         screenOptions={{ headerShown: false }}
@@ -29,6 +30,11 @@ export const RootNavigator = () => {
           name="ScanQRCode"
           component={ScanQRCodeScreen}
           options={{ headerShown: true, title: 'Scan QR Code' }}
+        />
+        <Stack.Screen
+          name="ForgotPassword"
+          component={ForgotPasswordScreen}
+          options={{ headerShown: true, title: 'Forgot Password' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

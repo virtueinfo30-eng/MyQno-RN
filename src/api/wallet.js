@@ -7,9 +7,13 @@ export const fetchWalletBalance = async () => {
     console.log('Wallet Balance Response:', response.data);
 
     if (response.data && response.data.found) {
+      const balance =
+        response.data.packagedetails?.recurity_deposite ||
+        response.data.available_balance ||
+        '0.00';
       return {
         success: true,
-        balance: response.data.available_balance || '0.00',
+        balance: balance,
         currency: response.data.currency || 'USD',
       };
     }

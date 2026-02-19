@@ -245,3 +245,38 @@ export const confirmOTP = async (
     };
   }
 };
+
+/**
+ * Import device contacts to the server.
+ * Matches native: api/user/importcontacts/{imported_by_user_id}
+ * contacts: [{mobile_number: "...", full_name: "..."}]
+ */
+export const importContacts = async (userId, contacts) => {
+  try {
+    const url = `${ENDPOINTS.IMPORT_CONTACTS}/${userId}`;
+    const formData = new FormData();
+    formData.append('contacts', JSON.stringify(contacts));
+
+    const response = await apiClient.post(url, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    console.log('Import Contacts Response:', response.data);
+
+    if (
+      response.data &&
+      (response.data.found || response.data.type === 'success')
+    ) {
+      return { success: true, message: response.data.message };
+    }
+    return {
+      success: false,
+      message: response.data?.message || 'Failed to import contacts',
+    };
+  } catch (error) {
+    console.error('Import Contacts Error:', error);
+    return {
+      success: false,
+      message: error.message || 'Failed to import contacts',
+    };
+  }
+};

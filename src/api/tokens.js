@@ -37,7 +37,8 @@ export const fetchMyTokens = async (
 
 export const cancelToken = async tokenId => {
   try {
-    const url = `api/user/canceltoken/${tokenId}/C`;
+    // Native uses: api/user/updateusertoken/{token_id}/{token_status}
+    const url = `api/user/updateusertoken/${tokenId}/C`;
 
     const response = await apiClient.get(url);
     console.log('Cancel Token Response:', response.data);

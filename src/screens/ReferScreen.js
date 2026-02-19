@@ -8,6 +8,7 @@ import {
   Alert,
   PermissionsAndroid,
   Platform,
+  TextInput,
 } from 'react-native';
 import Contacts from 'react-native-contacts';
 import { referFriends } from '../api/refer';
@@ -16,6 +17,8 @@ export const ReferScreen = ({ navigation }) => {
   const [contacts, setContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
     requestContactsPermission();
@@ -104,6 +107,13 @@ export const ReferScreen = ({ navigation }) => {
     }
   };
 
+  const filteredContacts = contacts.filter(contact => {
+    const text = searchText.toLowerCase();
+    const name = (contact.displayName || contact.givenName || '').toLowerCase();
+    const phone = (contact.phoneNumbers?.[0]?.number || '').toLowerCase();
+    return name.includes(text) || phone.includes(text);
+  });
+
   const renderContact = ({ item }) => {
     const isSelected = selectedContacts.some(c => c.recordID === item.recordID);
     const phoneNumber = item.phoneNumbers?.[0]?.number || 'No phone';
@@ -133,16 +143,28 @@ export const ReferScreen = ({ navigation }) => {
         <Text style={styles.subtitle}>
           Select contacts to refer ({selectedContacts.length} selected)
         </Text>
+
+        {/* Search Input */}
+        <View style={styles.searchContainer}>
+          <TextInput
+            style={styles.searchInput}
+            placeholder="Search contacts..."
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+        </View>
       </View>
 
       <FlatList
-        data={contacts}
+        data={filteredContacts}
         renderItem={renderContact}
         keyExtractor={item => item.recordID}
         contentContainerStyle={styles.listContainer}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyText}>No contacts found</Text>
+            <Text style={styles.emptyText}>
+              {searchText ? 'No matching contacts found' : 'No contacts found'}
+            </Text>
           </View>
         }
       />
@@ -186,6 +208,17 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginTop: 4,
+  },
+  searchContainer: {
+    marginTop: 12,
+  },
+  searchInput: {
+    backgroundColor: '#f5f5f5',
+    padding: 10,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+    fontSize: 16,
   },
   listContainer: {
     padding: 16,

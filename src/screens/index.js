@@ -16,3 +16,4 @@ export { MapScreen } from './MapScreen';
 export { ScanQRCodeScreen } from './ScanQRCodeScreen';
 export { ContactSelectionScreen } from './ContactSelectionScreen';
 export { ChangePasswordScreen } from './ChangePasswordScreen';
+export { ForgotPasswordScreen } from './ForgotPasswordScreen';

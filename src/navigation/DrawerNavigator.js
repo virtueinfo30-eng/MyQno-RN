@@ -1,8 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Image,
+  DeviceEventEmitter,
+} from 'react-native';
 import {
   createDrawerNavigator,
   DrawerContentScrollView,
+  useDrawerStatus,
 } from '@react-navigation/drawer';
 import { theme } from '../theme';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,13 +24,37 @@ import { PlacesVisitedScreen } from '../screens/PlacesVisitedScreen';
 import { SharedTokensScreen } from '../screens/SharedTokensScreen';
 import { ReferScreen } from '../screens/ReferScreen';
 import { ChangePasswordScreen } from '../screens/ChangePasswordScreen';
+import { fetchUserProfile } from '../api/profile';
 
 // Custom Drawer Content
 const CustomDrawerContent = props => {
   const navigation = useNavigation();
   const [userInfo, setUserInfo] = useState(null);
+
+  const isDrawerOpen = useDrawerStatus() === 'open';
+
+  useEffect(() => {
+    if (isDrawerOpen) {
+      console.log('🔄 [Drawer] Drawer opened - fetching fresh profile');
+      loadUserInfo();
+    }
+  }, [isDrawerOpen]);
+
   useEffect(() => {
     loadUserInfo();
+    const subscription = DeviceEventEmitter.addListener(
+      'profile_updated',
+      () => {
+        console.log(
+          '🔄 [Drawer] Received profile update signal - refetching API',
+        );
+        loadUserInfo();
+      },
+    );
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   const loadUserInfo = async () => {
@@ -30,7 +62,30 @@ const CustomDrawerContent = props => {
       const userDataStr = await AsyncStorage.getItem('user_session');
       if (userDataStr) {
         const userData = JSON.parse(userDataStr);
-        setUserInfo(userData);
+        const userId = userData.logged_user_id || userData.user_id;
+
+        if (userId) {
+          console.log('🔄 [Drawer] Fetching fresh profile for ID:', userId);
+          const result = await fetchUserProfile(userId);
+          if (result.success && result.data) {
+            const apiData = result.data;
+            // Map API data to what the drawer expects (userInfo structure)
+            const mappedUser = {
+              ...userData, // keep other session info
+              user_full_name: `${apiData.first_name || ''} ${
+                apiData.middle_name || ''
+              } ${apiData.last_name || ''}`.trim(),
+              user_mobile: apiData.reg_mobile || apiData.mobile_number || '',
+              user_pic: apiData.user_pic || '',
+            };
+            setUserInfo(mappedUser);
+          } else {
+            // Fallback to session data if API fails? Or just set what we have
+            setUserInfo(userData);
+          }
+        } else {
+          setUserInfo(userData);
+        }
       }
     } catch (error) {
       console.error('Error loading user info:', error);
@@ -62,6 +117,10 @@ const CustomDrawerContent = props => {
     </View>
   );
 
+  const displayImage = userInfo?.user_pic
+    ? `https://myqno.com/qapp/${userInfo.user_pic}`
+    : null;
+
   return (
     <DrawerContentScrollView
       {...props}
@@ -77,9 +136,9 @@ const CustomDrawerContent = props => {
           }}
         >
           <View style={styles.profileImageContainer}>
-            {userInfo?.user_pic ? (
+            {displayImage ? (
               <Image
-                source={{ uri: userInfo.user_pic }}
+                source={{ uri: displayImage }}
                 style={styles.profileImage}
               />
             ) : (

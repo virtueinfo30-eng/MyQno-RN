@@ -10,19 +10,17 @@ import {
 import { CustomInput, CustomButton, SelectionModal } from '../components';
 import { theme } from '../theme';
 import { useNavigation } from '@react-navigation/native';
-import { loginUser, getCountries } from '../api';
-import Icon from '@react-native-vector-icons/fontawesome';
+import { getCountries } from '../api';
+import { forgotPassword } from '../api/auth';
 
-export const LoginScreen = () => {
+export const ForgotPasswordScreen = () => {
   const navigation = useNavigation();
 
   const [countryId, setCountryId] = useState('');
   const [countryName, setCountryName] = useState('');
   const [countries, setCountries] = useState([]);
   const [showCountryModal, setShowCountryModal] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [mobile, setMobile] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -31,52 +29,47 @@ export const LoginScreen = () => {
 
   const loadCountries = async () => {
     const result = await getCountries();
-    console.log('Countries Result:', result);
     if (result.success) {
       setCountries(result.data);
-      // Optional: Set default country if needed
-    } else {
-      console.log('Failed to load countries');
     }
   };
 
-  const handleLogin = async () => {
+  const handleSubmit = async () => {
     if (!countryId) {
       Alert.alert('Error', 'Please select a country');
       return;
     }
-    if (!username || !password) {
-      Alert.alert('Error', 'Please enter username and password');
+    if (!mobile) {
+      Alert.alert('Error', 'Please enter your mobile number');
       return;
     }
 
     setLoading(true);
-    // Hardcoded location as requested
-    const latitude = '21.1702';
-    const longitude = '72.8311';
-    const result = await loginUser(
-      countryId,
-      username,
-      password,
-      latitude,
-      longitude,
-    );
+    const result = await forgotPassword(countryId, mobile);
     setLoading(false);
-    console.log('Login Result:', result);
-    if (result.success) {
-      navigation.replace('Main');
-    } else {
-      console.log('Login Failed:', result);
-      Alert.alert('Login Failed', result.message);
-    }
-  };
 
-  const handleForgotPassword = () => {
-    navigation.navigate('ForgotPassword');
+    if (result.success) {
+      Alert.alert(
+        'Success',
+        result.message || 'Password reset instructions sent to your mobile.',
+        [{ text: 'OK', onPress: () => navigation.goBack() }],
+      );
+    } else {
+      Alert.alert(
+        'Error',
+        result.message || 'Failed to reset password. Please try again.',
+      );
+    }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      <Text style={styles.title}>Forgot Password</Text>
+      <Text style={styles.subtitle}>
+        Enter your registered mobile number to receive password reset
+        instructions.
+      </Text>
+
       <TouchableOpacity onPress={() => setShowCountryModal(true)}>
         <View pointerEvents="none">
           <CustomInput
@@ -92,35 +85,23 @@ export const LoginScreen = () => {
         label="Mobile Number"
         placeholder="Enter Mobile Number"
         keyboardType="phone-pad"
-        value={username}
-        onChangeText={setUsername}
+        value={mobile}
+        onChangeText={setMobile}
       />
-      <CustomInput
-        label="Password"
-        placeholder="Enter Password"
-        secureTextEntry={!showPassword}
-        value={password}
-        onChangeText={setPassword}
-        rightIcon={
-          <Icon
-            name={showPassword ? 'eye-slash' : 'eye'}
-            size={20}
-            color="gray"
-          />
-        }
-        onRightIconPress={() => setShowPassword(!showPassword)}
-      />
-
-      <Text style={styles.forgotPassword} onPress={handleForgotPassword}>
-        Forgot Password?
-      </Text>
 
       <CustomButton
-        title="LOGIN"
-        onPress={handleLogin}
+        title="SUBMIT"
+        onPress={handleSubmit}
         loading={loading}
         style={styles.button}
       />
+
+      <TouchableOpacity
+        onPress={() => navigation.goBack()}
+        style={styles.backLink}
+      >
+        <Text style={styles.backLinkText}>Back to Login</Text>
+      </TouchableOpacity>
 
       <SelectionModal
         visible={showCountryModal}
@@ -142,13 +123,27 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.white,
     flexGrow: 1,
   },
+  title: {
+    fontSize: theme.fontSize.large || 22,
+    fontWeight: 'bold',
+    color: theme.colors.textPrimary,
+    marginBottom: theme.spacing.s,
+  },
+  subtitle: {
+    fontSize: theme.fontSize.medium || 14,
+    color: theme.colors.textSecondary || '#666',
+    marginBottom: theme.spacing.l,
+    lineHeight: 20,
+  },
   button: {
     marginTop: theme.spacing.xl,
   },
-  forgotPassword: {
-    color: theme.colors.textPrimary,
-    textAlign: 'center',
+  backLink: {
     marginTop: theme.spacing.l,
+    alignItems: 'center',
+  },
+  backLinkText: {
+    color: theme.colors.primary,
     fontSize: theme.fontSize.medium,
     textDecorationLine: 'underline',
   },

@@ -28,6 +28,9 @@ export const fetchPlacesVisited = async (
     // Handle both response formats:
     // 1. JSON object: {type: "success", listFavouriteInfo: [...]}
     // 2. Plain array: [] (when session auth fails)
+    // Handle both response formats:
+    // 1. JSON object: {type: "success", listFavouriteInfo: [...]}
+    // 2. Plain array: [] (when session auth fails)
     if (Array.isArray(response.data)) {
       console.warn(
         '⚠️ [places.js] Server returned plain array (Session Issue?):',
@@ -44,16 +47,18 @@ export const fetchPlacesVisited = async (
       };
     } else if (
       response.data &&
-      response.data.type &&
-      response.data.type.toLowerCase() === 'success'
+      // Check for success type (API returns "SUCCESS")
+      (response.data.type?.toUpperCase() === 'SUCCESS' ||
+        response.data.success === true)
     ) {
       console.log(
         '✅ [places.js] Success Type. Count:',
-        response.data.listFavouriteInfo?.length,
+        response.data.favourite?.length,
       );
       return {
         success: true,
-        data: response.data.listFavouriteInfo || [],
+        // The API returns the list in 'favourite', not 'listFavouriteInfo'
+        data: response.data.favourite || [],
       };
     }
 
