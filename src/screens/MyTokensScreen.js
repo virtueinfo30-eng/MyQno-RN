@@ -1,58 +1,90 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, useWindowDimensions } from 'react-native';
-import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { theme } from '../theme';
 import { MyTokensTab } from '../components/MyTokensTab';
 import { SharedTokensTab } from '../components/SharedTokensTab';
 
+const TABS = [
+  { key: 'myTokens', title: 'My Tokens' },
+  { key: 'sharedTokens', title: 'Shared Tokens' },
+];
+
 export const MyTokensScreen = () => {
-  const layout = useWindowDimensions();
-  const [index, setIndex] = useState(0);
-  const [routes] = useState([
-    { key: 'myTokens', title: 'My Tokens' },
-    { key: 'sharedTokens', title: 'Shared Tokens' },
-  ]);
-
-  const renderScene = SceneMap({
-    myTokens: MyTokensTab,
-    sharedTokens: SharedTokensTab,
-  });
-
-  const renderTabBar = props => (
-    <TabBar
-      {...props}
-      indicatorStyle={styles.tabIndicator}
-      style={styles.tabBar}
-      labelStyle={styles.tabLabel}
-      activeColor={theme.colors.white}
-      inactiveColor="rgba(255, 255, 255, 0.6)"
-    />
-  );
+  const [activeTab, setActiveTab] = useState('myTokens');
 
   return (
-    <TabView
-      navigationState={{ index, routes }}
-      renderScene={renderScene}
-      onIndexChange={setIndex}
-      initialLayout={{ width: layout.width }}
-      renderTabBar={renderTabBar}
-    />
+    <View style={styles.container}>
+      {/* Custom Tab Bar */}
+      <View style={styles.tabBar}>
+        {TABS.map(tab => (
+          <TouchableOpacity
+            key={tab.key}
+            style={[styles.tab, activeTab === tab.key && styles.activeTab]}
+            onPress={() => setActiveTab(tab.key)}
+            activeOpacity={0.8}
+          >
+            <Text
+              style={[
+                styles.tabLabel,
+                activeTab === tab.key && styles.activeTabLabel,
+              ]}
+            >
+              {tab.title}
+            </Text>
+            {activeTab === tab.key && <View style={styles.tabIndicator} />}
+          </TouchableOpacity>
+        ))}
+      </View>
+
+      {/* Tab Content */}
+      <View style={styles.content}>
+        {activeTab === 'myTokens' ? <MyTokensTab /> : <SharedTokensTab />}
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  tabBar: {
-    backgroundColor: theme.colors.primary,
-    elevation: 0,
-    shadowOpacity: 0,
+  container: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
   },
-  tabIndicator: {
-    backgroundColor: theme.colors.white,
-    height: 3,
+  tabBar: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.primary,
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  tab: {
+    flex: 1,
+    paddingVertical: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  activeTab: {
+    // highlighted via indicator
   },
   tabLabel: {
-    fontWeight: '600',
     fontSize: theme.fontSize.medium,
-    textTransform: 'none',
+    fontWeight: '600',
+    color: 'rgba(255, 255, 255, 0.65)',
+  },
+  activeTabLabel: {
+    color: theme.colors.white,
+  },
+  tabIndicator: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    height: 3,
+    backgroundColor: theme.colors.white,
+    borderRadius: 2,
+  },
+  content: {
+    flex: 1,
   },
 });

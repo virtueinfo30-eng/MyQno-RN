@@ -8,6 +8,7 @@ import { ScanQRCodeScreen } from '../screens/ScanQRCodeScreen';
 import { AuthNavigator } from './AuthNavigator';
 import { DrawerNavigator } from './DrawerNavigator';
 import { ForgotPasswordScreen } from '../screens/ForgotPasswordScreen';
+import { ContactSelectionScreen } from '../screens/ContactSelectionScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -35,6 +36,11 @@ export const RootNavigator = ({ navigationRef }) => {
           name="ForgotPassword"
           component={ForgotPasswordScreen}
           options={{ headerShown: true, title: 'Forgot Password' }}
+        />
+        <Stack.Screen
+          name="ContactSelection"
+          component={ContactSelectionScreen}
+          options={{ headerShown: true, title: 'Select Contacts' }}
         />
       </Stack.Navigator>
     </NavigationContainer>

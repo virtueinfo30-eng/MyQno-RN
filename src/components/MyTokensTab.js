@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -25,7 +25,7 @@ export const MyTokensTab = () => {
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const [userId, setUserId] = useState('');
-  const [userLocation, setUserLocation] = useState(null); // GPS location
+  const [userLocation, setUserLocation] = useState(null);
 
   // Feedback State
   const [feedbackVisible, setFeedbackVisible] = useState(false);
@@ -93,13 +93,9 @@ export const MyTokensTab = () => {
     }
   };
 
-  /**
-   * Calculate straight-line distance between two lat/lng points (Haversine formula).
-   * Returns distance in km as a string like "2.3 km".
-   */
   const getDistance = (lat1, lng1, lat2, lng2) => {
     if (!lat1 || !lng1 || !lat2 || !lng2) return null;
-    const R = 6371; // Earth radius in km
+    const R = 6371;
     const dLat = ((lat2 - lat1) * Math.PI) / 180;
     const dLng = ((lng2 - lng1) * Math.PI) / 180;
     const a =

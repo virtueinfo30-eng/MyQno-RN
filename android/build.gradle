@@ -20,6 +20,14 @@ buildscript {
     }
 }
     subprojects {
+        // Force consistent GMS play-services-location version to fix
+        // IncompatibleClassChangeError between react-native-geolocation-service
+        // and @react-native-firebase (FusedLocationProviderClient conflict)
+        configurations.all {
+            resolutionStrategy {
+                force 'com.google.android.gms:play-services-location:21.3.0'
+            }
+        }
         afterEvaluate { project ->
             if (project.hasProperty("android")) {
                 project.android {
